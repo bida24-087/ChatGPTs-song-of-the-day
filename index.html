@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song of the Day</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: white;
+            text-align: center;
+        }
+
+        .vinyl {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/5/56/Vinyl_Record_Symbol.svg') no-repeat center center;
+            background-size: cover;
+            margin: 50px auto;
+            animation: spin 8s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #1e1e1e;
+            transition: 0.3s;
+            padding-top: 60px;
+            z-index: 1000;
+        }
+
+        .side-menu a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .side-menu a:hover {
+            background-color: #575757;
+        }
+
+        .menu-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .song-list {
+            margin-top: 50px;
+            text-align: left;
+            padding: 20px;
+        }
+
+        .song-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .song-item:hover {
+            background-color: #575757;
+        }
+
+        .audio-preview {
+            display: none;
+            margin-top: 5px;
+        }
+
+        .song-item:hover .audio-preview {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="vinyl"></div>
+    
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    
+    <div class="side-menu" id="sideMenu">
+        <a href="javascript:void(0)" onclick="closeMenu()">Close</a>
+        <div class="song-list" id="songList"></div>
+    </div>
+
+    <script>
+        // Get today's song details (you can set this to be dynamic)
+        const todaySong = {
+            title: "Arctic Monkeys - Do I Wanna Know?",
+            description: "A moody, slow-burn anthem by Arctic Monkeys. Perfect for late-night vibes.",
+            albumCover: "https://upload.wikimedia.org/wikipedia/en/f/f1/Do_I_Wanna_Know.png",
+            previewUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" // Change to your song's preview URL
+        };
+
+        // Function to update today's song and store it in localStorage
+        function updateSongOfTheDay() {
+            const date = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+            const storedDiary = JSON.parse(localStorage.getItem('songDiary')) || [];
+
+            // Add today's song to diary
+            storedDiary.push({
+                date: date,
+                song: todaySong
+            });
+
+            // Store updated diary back in localStorage
+            localStorage.setItem('songDiary', JSON.stringify(storedDiary));
+        }
+
+        // Function to render the song diary
+        function renderSongDiary() {
+            const storedDiary = JSON.parse(localStorage.getItem('songDiary')) || [];
+            const songList = document.getElementById('songList');
+
+            // Clear the list and add past songs
+            songList.innerHTML = '';
+            storedDiary.forEach(entry => {
+                const songItem = document.createElement('div');
+                songItem.classList.add('song-item');
+                songItem.innerHTML = `
+                    <strong>${entry.song.title}</strong> (${entry.date})
+                    <p>${entry.song.description}</p>
+                    <audio class="audio-preview" src="${entry.song.previewUrl}" preload="auto" controls></audio>
+                `;
+                songList.appendChild(songItem);
+            });
+        }
+
+        // Toggle the side menu
+        function toggleMenu() {
+            var menu = document.getElementById("sideMenu");
+            menu.style.left = (menu.style.left === "-250px") ? "0" : "-250px";
+        }
+
+        // Close the side menu
+        function closeMenu() {
+            document.getElementById("sideMenu").style.left = "-250px";
+        }
+
+        // Initialize the website
+        updateSongOfTheDay();  // Update today's song in the diary
+        renderSongDiary();     // Render the song diary
+
+    </script>
+</body>
+</html>
